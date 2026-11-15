@@ -6,18 +6,44 @@ const poses=['😴','🧸','☁️','💤','🌙'];
 const energy=n=>n===5?'Descanso':n===4?'Calma':n===3?'Alegría':n===2?'Energía':'Seguridad';
 const say=t=>window.dispatchEvent(new CustomEvent('valle:speak',{detail:t}));
 const sound=(kind='tap')=>window.dispatchEvent(new CustomEvent('valle:sound',{detail:kind}));
-function text(s,x,y,t,size=25){return s.add.text(x,y,t,{fontFamily:'Arial',fontSize:size+'px',fontStyle:'bold',color:'#244a57',align:'center',wordWrap:{width:790}}).setOrigin(.5)}
-function box(s,x,y,w,h,c=0xfff7df){const g=s.add.graphics();g.fillStyle(c);g.fillRoundedRect(x-w/2,y-h/2,w,h,22);return g}
-function button(s,x,y,t,cb,w=260){box(s,x,y,w,60);text(s,x,y,t,23);s.add.zone(x,y,w,60).setInteractive({useHandCursor:true}).on('pointerdown',()=>{sound('tap');cb()})}
-function bg(s,night=false){s.cameras.main.setBackgroundColor(night?'#243956':'#c3ecdf');const g=s.add.graphics();g.fillStyle(night?0x395c63:0x8ac5a1);g.fillEllipse(470,590,1250,280);for(let i=0;i<10;i++){let x=i*115;g.fillStyle(0x806d60);g.fillRect(x,405,14,150);g.fillStyle(night?0x31645f:0x58a184);g.fillCircle(x+7,406,42)}}
-function lumi(s,x,y,sleep=false){const c=s.add.container(x,y),g=s.add.graphics();g.fillStyle(sleep?0x9eb2d5:0x7bd9f3);g.fillCircle(-30,0,32);g.fillCircle(0,-20,40);g.fillCircle(32,0,32);g.fillEllipse(0,18,110,52);g.lineStyle(4,0x2c5262);if(sleep){g.arc(-15,5,8,0,Math.PI);g.strokePath();g.arc(20,5,8,0,Math.PI);g.strokePath()}else{g.fillStyle(0x2c5262);g.fillCircle(-15,5,5);g.fillCircle(20,5,5);g.arc(2,13,9,0,Math.PI);g.strokePath()}c.add(g);s.tweens.add({targets:c,y:y-9,yoyo:true,repeat:-1,duration:1200});return c}
-function owl(s,x=125,y=485){text(s,x,y,'🦉',78)}
+function text(s,x,y,t,size=25){return s.add.text(x,y,t,{fontFamily:'Trebuchet MS, Arial',fontSize:size+'px',fontStyle:'bold',color:'#36534c',align:'center',stroke:'#fffaf0',strokeThickness:size>=30?2:0,wordWrap:{width:790}}).setOrigin(.5)}
+function box(s,x,y,w,h,c=0xfff5db){const g=s.add.graphics();g.fillStyle(0x436c55,.18);g.fillRoundedRect(x-w/2+3,y-h/2+6,w,h,24);g.fillStyle(c);g.fillRoundedRect(x-w/2,y-h/2,w,h,24);g.lineStyle(2,0xffffff,.75);g.strokeRoundedRect(x-w/2+3,y-h/2+3,w-6,h-6,21);return g}
+function button(s,x,y,t,cb,w=260){const b=box(s,x,y,w,60);const label=text(s,x,y,t,23);const hit=s.add.zone(x,y,w,60).setInteractive({useHandCursor:true}).on('pointerdown',()=>{sound('tap');cb()});s.tweens.add({targets:[b,label],scaleX:1.015,scaleY:1.015,yoyo:true,repeat:-1,duration:1800});return hit}
+function bg(s,night=false){
+  s.cameras.main.setBackgroundColor(night?'#263c62':'#9fe0d5');
+  const g=s.add.graphics();
+  g.fillGradientStyle(night?0x172a50:0x84d4dc,night?0x172a50:0x84d4dc,night?0x708b83:0xe2f8d1,night?0x708b83:0xe2f8d1);
+  g.fillRect(0,0,960,600);
+  g.fillStyle(night?0xdce6be:0xfff5ba,.65);g.fillCircle(800,105,night?44:60);
+  for(let i=0;i<18;i++){const x=(i*173+37)%960,y=38+(i*71)%270;g.fillStyle(night?0xf4f7d3:0xffffff,night?.5:.36);g.fillCircle(x,y,night?2:4)}
+  for(let layer=0;layer<3;layer++){
+    const y=330+layer*68;g.fillStyle((night?[0x334c68,0x31585a,0x3e685d]:[0x9bcda4,0x7ebc90,0x5d9c77])[layer]);
+    g.fillEllipse(470,y+195,1330,380);
+    for(let i=0;i<13;i++){const x=i*86-25+(layer%2)*38;const h=75+((i*29+layer*17)%65);g.fillStyle(night?0x3e4656:0x7c6c57);g.fillRoundedRect(x,y-h+42,12,100,5);g.fillStyle((night?[0x365b61,0x2e625c,0x2a6458]:[0x6fae88,0x4c9c78,0x36875e])[layer]);g.fillCircle(x+6,y-h+28,29+layer*4);g.fillCircle(x-12,y-h+41,22);g.fillCircle(x+25,y-h+43,23)}
+  }
+  g.fillStyle(night?0x557a70:0x93c78d);g.fillEllipse(480,595,1250,230);
+  for(let i=0;i<26;i++){const x=(i*127+33)%950,y=470+(i*53)%122;g.fillStyle(i%3===0?0xf6d2da:i%3===1?0xf7e5a0:0xfdf5e3,.9);g.fillCircle(x,y,3+(i%3));g.fillStyle(0x4d9875,.9);g.fillEllipse(x+5,y+5,10,4)}
+  const fireflies=[];for(let i=0;i<9;i++){const x=70+(i*107)%810,y=180+(i*79)%270;const dot=s.add.circle(x,y,3,night?0xfff4ac:0xfff9d0,.65);fireflies.push(dot);s.tweens.add({targets:dot,alpha:.15,y:y-14,duration:1700+i*180,yoyo:true,repeat:-1})}
+}
+function lumi(s,x,y,sleep=false){
+  const c=s.add.container(x,y),glow=s.add.graphics(),g=s.add.graphics();
+  glow.fillStyle(sleep?0xc1c5e6:0xc9f7ff,.23);glow.fillCircle(0,5,90);
+  g.fillStyle(0x527b91,.12);g.fillEllipse(0,76,124,18);
+  g.fillStyle(sleep?0xa8b7dc:0x8ddcf2);g.fillCircle(-35,0,34);g.fillCircle(0,-24,44);g.fillCircle(34,0,35);g.fillEllipse(0,16,118,55);
+  g.fillStyle(0xffffff,.4);g.fillEllipse(-16,-39,31,12);
+  g.fillStyle(0xf6a7af,.7);g.fillCircle(-29,18,10);g.fillCircle(31,18,10);
+  g.lineStyle(4,0x31536c);
+  if(sleep){g.arc(-15,5,8,0,Math.PI);g.strokePath();g.arc(19,5,8,0,Math.PI);g.strokePath()}
+  else{g.fillStyle(0x31536c);g.fillCircle(-16,4,5);g.fillCircle(20,4,5);g.arc(2,14,9,0,Math.PI);g.strokePath()}
+  c.add([glow,g]);s.tweens.add({targets:c,y:y-11,yoyo:true,repeat:-1,duration:1500,ease:'Sine.easeInOut'});return c
+}
+function owl(s,x=125,y=485){const t=text(s,x,y,'🦉',78);s.tweens.add({targets:t,angle:4,yoyo:true,repeat:-1,duration:2100});return t}
 function shadow(s,x,y){const body=s.add.graphics();body.fillStyle(0x685d8c);body.fillEllipse(x,y,72,58);body.fillStyle(0xffffff);body.fillCircle(x-12,y-8,7);body.fillCircle(x+12,y-8,7);body.fillStyle(0x242e49);body.fillCircle(x-12,y-8,3);body.fillCircle(x+12,y-8,3);return body}
 function guide(s,t){box(s,535,485,760,100);owl(s);text(s,540,485,t,20);say(t)}
 const lessons=['Los espacios seguros nos ayudan a cuidarnos. Si ves un peligro real, avisa a una persona adulta.','Los alimentos variados y el agua nos ayudan a crecer con energía.','Jugar es importante para aprender, compartir y ser felices.','Una rutina tranquila nos ayuda a prepararnos para descansar.','Descansar en un lugar tranquilo nos ayuda a sentirnos mejor.'];
 const instructions=['Arrastra los tres escudos sobre los peligros.','Toca cinco alimentos saludables y evita los objetos que no se comen.','Mueve las piezas para completar el parque y después juega con Lumi.','Apaga las luces, coloca la manta y activa las estrellas.','Toca las burbujas de ruido mientras Lumi duerme.'];
 function header(s,t,sub){box(s,480,78,820,110);text(s,480,56,t,35);text(s,480,103,sub,19)}
-export class Menu extends Phaser.Scene{constructor(){super('Menu')}create(){bg(this);header(this,'🌙 Guardianes del Valle Dormilón','Cuida, juega y descansa con Lumi');lumi(this,480,315);owl(this,255,340);button(this,480,480,'✨ ¡Comenzar!',()=>this.scene.start('Map'));button(this,790,560,'📖 Álbum',()=>this.scene.start('Album'),210);say('¡Hola! Soy Don Plumas. ¡Bienvenido al Valle Dormilón!')}}
+export class Menu extends Phaser.Scene{constructor(){super('Menu')}create(){bg(this);header(this,'🌙 Guardianes del Valle Dormilón','Un bosque mágico para cuidar, jugar y soñar');box(this,475,346,520,230,0xfff9e8);text(this,480,262,'✨ Bienvenidos al Valle ✨',25);lumi(this,495,370);owl(this,290,385);text(this,655,368,'🌼 🦋',38);button(this,475,505,'🌿 ¡Explorar el valle!',()=>this.scene.start('Map'),310);button(this,790,558,'📖 Álbum',()=>this.scene.start('Album'),205);say('¡Hola! Soy Don Plumas. ¡Bienvenido al Valle Dormilón!')}}
 export class Map extends Phaser.Scene{constructor(){super('Map')}create(){bg(this);header(this,'🗺️ Mapa del valle','Elige tu próxima aventura');const p=read();text(this,480,165,'Tu aventura: '+p.completed.length+'/5 derechos aprendidos',21);[[160,260],[370,330],[585,260],[800,330],[480,435]].forEach(([x,y],i)=>{const open=i<p.unlocked;box(this,x,y,170,95,open?0xfff7df:0xb8c8c8);text(this,x,y-17,open?icons[i]:'🔒',33);text(this,x,y+24,'Nivel '+(i+1),18);this.add.zone(x,y,170,95).setInteractive({useHandCursor:true}).on('pointerdown',()=>open?this.scene.start('Level',{n:i+1}):say('Completa primero los niveles anteriores.'))});button(this,155,552,'← Inicio',()=>this.scene.start('Menu'),180);button(this,795,552,'📖 Álbum',()=>this.scene.start('Album'),180)}}
 export class Level extends Phaser.Scene{constructor(){super('Level')}init(d){this.n=d.n||1}create(){this.stage=0;this.score=0;this.done=false;bg(this,this.n>=4);header(this,icons[this.n-1]+' '+names[this.n-1],['Protege el jardín','Elige alimentos saludables','Construye el parque','Prepara el descanso','Protege el sueño'][this.n-1]);button(this,125,560,'← Mapa',()=>this.scene.start('Map'),170);this.showIntro()}showIntro(){const cover=this.add.container(0,0).setDepth(100);const shade=this.add.graphics();shade.fillStyle(0x173e49,.92);shade.fillRect(0,0,960,600);cover.add(shade);const title=this.add.text(480,175,'🌟 Nivel '+this.n+'\n'+names[this.n-1],{fontFamily:'Arial',fontSize:'37px',fontStyle:'bold',color:'#fff7df',align:'center',wordWrap:{width:800}}).setOrigin(.5);cover.add(title);const msg=this.add.text(480,320,instructions[this.n-1],{fontFamily:'Arial',fontSize:'26px',color:'#ffffff',align:'center',wordWrap:{width:720}}).setOrigin(.5);cover.add(msg);const start=this.add.text(480,450,'▶ ¡Vamos a jugar!',{fontFamily:'Arial',fontSize:'29px',fontStyle:'bold',color:'#fff7df',backgroundColor:'#397f78',padding:{x:28,y:18}}).setOrigin(.5).setInteractive({useHandCursor:true});cover.add(start);say('Nivel '+this.n+'. '+instructions[this.n-1]);start.on('pointerdown',()=>{sound('tap');cover.destroy(true);if(this.n===1)this.one();if(this.n===2)this.two();if(this.n===3)this.three();if(this.n===4)this.four();if(this.n===5)this.five()})}
 complete(){if(this.done)return;this.done=true;sound('win');save(this.n);this.time.delayedCall(650,()=>this.scene.start('Victory',{n:this.n}))}
