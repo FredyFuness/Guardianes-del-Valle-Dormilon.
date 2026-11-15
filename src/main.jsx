@@ -1,1 +1,54 @@
-import React,{useEffect,useRef,useState} from 'react';import{createRoot}from'react-dom/client';import Phaser from 'phaser';import{Menu,Map,Level,Victory,Album}from './game/scenes.js';import './style.css';function App(){const host=useRef(null),game=useRef(null);const[voice,setVoice]=useState(true);useEffect(()=>{const speak=e=>{if(!voice||!('speechSynthesis'in window))return;speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(e.detail);u.lang='es-SV';u.rate=.88;speechSynthesis.speak(u)};window.addEventListener('valle:speak',speak);return()=>window.removeEventListener('valle:speak',speak)},[voice]);useEffect(()=>{game.current=new Phaser.Game({type:Phaser.AUTO,parent:host.current,width:960,height:600,backgroundColor:'#c8eee0',scale:{mode:Phaser.Scale.FIT,autoCenter:Phaser.Scale.CENTER_BOTH},scene:[Menu,Map,Level,Victory,Album]});return()=>{game.current?.destroy(true);speechSynthesis?.cancel()}},[]);return <main className="shell"><header><strong>🌙 Guardianes del Valle Dormilón</strong><button onClick={()=>setVoice(v=>!v)} aria-label="Activar o desactivar narración">{voice?'🔊 Voz activada':'🔇 Voz desactivada'}</button></header><div className="game" ref={host}/><footer>Un juego para aprender a cuidarnos, jugar y descansar 💙</footer></main>}createRoot(document.getElementById('root')).render(<App/>);
+import React, { useEffect, useRef, useState } from 'react';
+import { createRoot } from 'react-dom/client';
+import Phaser from 'phaser';
+import { Menu, Map, Level, Victory, Album } from './game/scenes.js';
+import './style.css';
+
+function App() {
+  const mount = useRef(null);
+  const game = useRef(null);
+  const [voice, setVoice] = useState(true);
+  const voiceEnabled = useRef(voice);
+  voiceEnabled.current = voice;
+
+  useEffect(() => {
+    const speak = event => {
+      if (!voiceEnabled.current || !('speechSynthesis' in window)) return;
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(event.detail);
+      utterance.lang = 'es-SV';
+      utterance.rate = 0.86;
+      utterance.pitch = 1.1;
+      window.speechSynthesis.speak(utterance);
+    };
+    window.addEventListener('valle:speak', speak);
+    game.current = new Phaser.Game({
+      type: Phaser.AUTO,
+      parent: mount.current,
+      width: 960,
+      height: 600,
+      backgroundColor: '#c8eee0',
+      scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_BOTH },
+      input: { activePointers: 3 },
+      scene: [Menu, Map, Level, Victory, Album]
+    });
+    return () => {
+      window.removeEventListener('valle:speak', speak);
+      if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+      game.current?.destroy(true);
+      game.current = null;
+    };
+  }, []);
+
+  return <main className="shell">
+    <header><strong>🌙 Guardianes del Valle Dormilón</strong>
+      <button type="button" aria-pressed={voice} onClick={() => {
+        setVoice(v => !v);
+        if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+      }}>{voice ? '🔊 Voz activada' : '🔇 Voz desactivada'}</button>
+    </header>
+    <div className="game" ref={mount} aria-label="Juego interactivo Guardianes del Valle Dormilón" />
+    <footer>Un juego para aprender a cuidarnos, jugar y descansar 💙</footer>
+  </main>;
+}
+createRoot(document.getElementById('root')).render(<App />);
