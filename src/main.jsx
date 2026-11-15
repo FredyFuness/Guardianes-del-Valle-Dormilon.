@@ -22,6 +22,32 @@ function App() {
       window.speechSynthesis.speak(utterance);
     };
     window.addEventListener('valle:speak', speak);
+    let audioContext;
+    const playSound = event => {
+      try {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContextClass) return;
+        audioContext ||= new AudioContextClass();
+        if (audioContext.state === 'suspended') audioContext.resume();
+        const type = event.detail;
+        const notes = type === 'win' ? [523,659,784,1046] : type === 'star' ? [523,784,1046] : [type === 'error' ? 220 : type === 'good' ? 659 : 440];
+        notes.forEach((frequency, index) => {
+          const oscillator = audioContext.createOscillator();
+          const volume = audioContext.createGain();
+          const start = audioContext.currentTime + index * 0.11;
+          oscillator.type = type === 'error' ? 'triangle' : 'sine';
+          oscillator.frequency.setValueAtTime(frequency,start);
+          volume.gain.setValueAtTime(0.0001,start);
+          volume.gain.exponentialRampToValueAtTime(0.07,start+0.015);
+          volume.gain.exponentialRampToValueAtTime(0.0001,start+0.2);
+          oscillator.connect(volume);
+          volume.connect(audioContext.destination);
+          oscillator.start(start);
+          oscillator.stop(start+0.21);
+        });
+      } catch { /* Audio no disponible en este navegador */ }
+    };
+    window.addEventListener('valle:sound', playSound);
     game.current = new Phaser.Game({
       type: Phaser.AUTO,
       parent: mount.current,
@@ -34,6 +60,8 @@ function App() {
     });
     return () => {
       window.removeEventListener('valle:speak', speak);
+      window.removeEventListener('valle:sound', playSound);
+      audioContext?.close();
       if ('speechSynthesis' in window) window.speechSynthesis.cancel();
       game.current?.destroy(true);
       game.current = null;
