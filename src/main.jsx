@@ -86,6 +86,7 @@ function App() {
       }}>{voice ? '🔊 Voz activada' : '🔇 Voz desactivada'}</button>
     </header>
     <button type="button" className="fullscreen" aria-pressed={expanded} onClick={() => { setExpanded(v => !v); }}> {expanded ? "↙ Salir del modo ampliado" : "⛶ Ampliar juego"} </button>
+    <p className="orientation-hint">↻ Gira el teléfono horizontalmente para jugar más grande</p>
     <div className="game" ref={mount} aria-label="Juego interactivo Guardianes del Valle Dormilón" />
     <footer>Un juego para aprender a cuidarnos, jugar y descansar 💙</footer>
   </main>;
