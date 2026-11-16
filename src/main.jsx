@@ -6,6 +6,7 @@ import './style.css';
 
 function App() {
   const mount = useRef(null);
+  const shell = useRef(null);
   const game = useRef(null);
   const [voice, setVoice] = useState(true);
   const voiceEnabled = useRef(voice);
@@ -68,13 +69,14 @@ function App() {
     };
   }, []);
 
-  return <main className="shell">
+  return <main className="shell" ref={shell}>
     <header><strong>🌙 Guardianes del Valle Dormilón</strong>
       <button type="button" aria-pressed={voice} onClick={() => {
         setVoice(v => !v);
         if ('speechSynthesis' in window) window.speechSynthesis.cancel();
       }}>{voice ? '🔊 Voz activada' : '🔇 Voz desactivada'}</button>
     </header>
+    <button type="button" className="fullscreen" onClick={() => { const el=shell.current; if(!document.fullscreenElement) el?.requestFullscreen?.().catch(()=>{}); else document.exitFullscreen?.(); }}>⛶ Pantalla completa</button>
     <div className="game" ref={mount} aria-label="Juego interactivo Guardianes del Valle Dormilón" />
     <footer>Un juego para aprender a cuidarnos, jugar y descansar 💙</footer>
   </main>;
